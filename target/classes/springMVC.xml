@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+       		http://www.springframework.org/schema/context
+       		http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        	http://www.springframework.org/schema/mvc
+        	http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        	http://www.springframework.org/schema/tx
+        	http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+        	
+        	
+  <!--基础扫描包路径，开启 mvc annotation模式-->
+    <context:component-scan base-package="com.linkon"/>   
+
+	<!-- 注解的方式注册映射器和适配器  简称注解驱动 -->
+	<mvc:annotation-driven />
+	
+<!-- 	<mvc:default-servlet-handler/> -->
+	
+	<!--设置欢迎页  -->
+     <mvc:view-controller path="/" view-name="index"/> 
+    
+<!--     对外公开资源文件，不予拦截 ,如果不配置，则访问不到 -->
+    <mvc:resources location="/public/css/" mapping="/public/css/**" /> 
+    <mvc:resources location="/public/fonts/" mapping="/public/fonts/**" /> 
+    <mvc:resources location="/public/images/" mapping="/public/images/**" /> 
+    <mvc:resources location="/public/js/" mapping="/public/js/**" /> 
+    
+    <!--拦截器配置-->
+    <mvc:interceptors>
+        <bean class="com.linkon.service.interceptor.LoginInterceptor"/>
+    </mvc:interceptors>  
+    
+    <!-- @ResponseBody的json转换 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <!--json 格式输出-->
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+            	 <!-- 避免IE执行AJAX时,返回JSON出现下载文件 -->
+            	<property name="supportedMediaTypes">
+                     <list>
+                         <value>text/html; charset=UTF-8</value>
+                         <value>application/json;charset=UTF-8</value>
+                     </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>    
+    
+    <!-- 配置velocity引擎 -->
+ 	<bean id="velocityConfigurer"
+          class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+        <!-- 渲染页面存放的路径 --> 
+        <property name="resourceLoaderPath" value="/WEB-INF/view/"/>
+        <!-- 渲染配置 --> 
+        <property name="configLocation" value="classpath:velocity.properties"/>
+    </bean>
+    
+    <!-- 配置视图的显示 -->
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+        <property name="cache" value="false"/>
+        <property name="prefix" value=""/><!-- 视图文件的前缀，即存放的路径 -->
+        <property name="suffix" value=".html"/><!-- 视图文件的后缀名 -->
+        <property name="contentType" value="text/html;charset=utf-8"/><!-- 响应消息的内容类型 -->
+        <property name="exposeSpringMacroHelpers" value="true"/><!--是否使用spring对宏定义的支持-->
+        <property name="exposeSessionAttributes" value="true"/><!--是否开放Session属性--> 
+        <property name="exposeRequestAttributes" value="true"/><!--是否开放request属性--> 
+        <property name="requestContextAttribute" value="request"/><!--request属性引用名称-->
+        <!--这里比较特殊 配置这个文件路径时使用的是项目的相对路径-->
+        <property name="toolboxConfigLocation" value="/WEB-INF/classes/velocity-toolbox.xml"/>
+    </bean>	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+        	
+</beans>
